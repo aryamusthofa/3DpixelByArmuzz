@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>CHROMA RIFT — Pixel × 3D</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div id="app">
+  <canvas id="gl"></canvas>
+  <div id="fx"></div>
+  <div id="flash"></div>
+
+  <div id="ui">
+    <!-- ===== HUD ===== -->
+    <div id="hud" class="hidden">
+      <div class="hud-top">
+        <div class="hud-left">
+          <div class="hud-label">SCORE</div>
+          <div id="score" class="hud-score">000000</div>
+          <div class="hud-best">BEST <span id="hudBest">000000</span></div>
+        </div>
+        <div class="hud-center">
+          <div id="combo" class="combo-pill">x1</div>
+          <div class="combo-bar"><div id="comboBar"></div></div>
+          <div id="sector" class="sector-label">SECTOR 1 · NEON GRID</div>
+        </div>
+        <div class="hud-right">
+          <button id="btnPause" class="icon-btn" aria-label="Jeda">❚❚</button>
+        </div>
+      </div>
+      <div class="hud-bottom">
+        <div id="hearts" class="hearts"></div>
+        <div id="dashWrap" class="dash-wrap">
+          <div class="dash-label">DASH <span id="dashState">READY</span></div>
+          <div class="dash-bar"><div id="dashFill"></div></div>
+        </div>
+      </div>
+      <div id="fps" class="fps">60 FPS</div>
+    </div>
+
+    <!-- ===== MENU ===== -->
+    <div id="menu" class="screen">
+      <div class="panel menu-panel">
+        <div class="logo">CHROMA<span>RIFT</span></div>
+        <div class="tagline">PIXEL SOUL · 3D WORLD · ENDLESS RUN</div>
+        <div class="menu-best">BEST <b id="menuBest">000000</b></div>
+        <button id="btnPlay" class="btn primary">Mulai Permainan</button>
+        <button id="btnSettings" class="btn">Pengaturan</button>
+        <button id="btnHelp" class="btn">Cara Main</button>
+        <div class="footer">v0.1 FOUNDATION · ASET 100% PROSEDURAL</div>
+      </div>
+    </div>
+
+    <!-- ===== HELP ===== -->
+    <div id="help" class="screen hidden">
+      <div class="panel">
+        <h2 class="panel-title">CARA MAIN</h2>
+        <div class="help-grid">
+          <div class="help-row"><span>Gerak kiri / kanan</span><b>A D / ← →</b></div>
+          <div class="help-row"><span>Lompat (bisa 2x)</span><b>SPASI / W / ↑</b></div>
+          <div class="help-row"><span>Dash</span><b>SHIFT / X</b></div>
+          <div class="help-row"><span>Jeda</span><b>ESC</b></div>
+          <div class="help-row"><span>Layar penuh</span><b>F</b></div>
+          <div class="help-row"><span>Sentuh</span><b>Joystick + tombol</b></div>
+        </div>
+        <p class="help-note">Kumpulkan core kuning untuk skor dan combo. Hindari balok merah — lompat atau pindah jalur. Kecepatan terus naik di setiap sektor. Dash memberi dorongan gerak sesaat.</p>
+        <button id="btnHelpBack" class="btn">Kembali</button>
+      </div>
+    </div>
+
+    <!-- ===== SETTINGS ===== -->
+    <div id="settings" class="screen hidden">
+      <div class="panel">
+        <h2 class="panel-title">PENGATURAN</h2>
+        <div class="row"><label>Kualitas Grafis</label>
+          <select id="optQuality">
+            <option value="low">Low — HP lawas</option>
+            <option value="medium">Medium — seimbang</option>
+            <option value="high">High — modern</option>
+            <option value="ultra">Ultra — high-end</option>
+          </select></div>
+        <div class="row"><label>Adaptif (auto FPS)</label><input type="checkbox" id="optAdaptive"></div>
+        <div class="row"><label>Musik</label><input type="checkbox" id="optMusic"></div>
+        <div class="row"><label>Efek Suara</label><input type="checkbox" id="optSfx"></div>
+        <div class="row"><label>Tampilkan FPS</label><input type="checkbox" id="optFps"></div>
+        <div class="row"><label>Layar Penuh</label><button id="btnFullscreen" class="btn small">Toggle</button></div>
+        <button id="btnSettingsBack" class="btn">Kembali</button>
+      </div>
+    </div>
+
+    <!-- ===== PAUSE ===== -->
+    <div id="pause" class="screen hidden">
+      <div class="panel">
+        <h2 class="panel-title">JEDA</h2>
+        <button id="btnResume" class="btn primary">Lanjutkan</button>
+        <button id="btnPauseSettings" class="btn">Pengaturan</button>
+        <button id="btnPauseRestart" class="btn">Ulangi Run</button>
+        <button id="btnPauseMenu" class="btn">Menu Utama</button>
+      </div>
+    </div>
+
+    <!-- ===== GAME OVER ===== -->
+    <div id="gameover" class="screen hidden">
+      <div class="panel">
+        <h2 class="panel-title">RUN BERAKHIR</h2>
+        <div id="newRecord" class="record hidden">NEW RECORD!</div>
+        <div class="go-score-label">SKOR</div>
+        <div id="goScore" class="go-score">000000</div>
+        <div class="go-best">BEST <b id="goBest">000000</b></div>
+        <button id="btnRetry" class="btn primary">Coba Lagi</button>
+        <button id="btnGoMenu" class="btn">Menu Utama</button>
+      </div>
+    </div>
+
+    <div id="banner" class="banner"></div>
+
+    <!-- ===== MOBILE CONTROLS ===== -->
+    <div id="mobile" class="hidden">
+      <div id="joystick"><div id="stick"></div></div>
+      <div class="mbtns">
+        <button id="btnDash" class="mbtn dash">DASH</button>
+        <button id="btnJump" class="mbtn jump">JUMP</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="fatal" class="screen hidden">
+    <div class="panel">
+      <h2 class="panel-title">GAGAL MEMUAT</h2>
+      <p class="help-note">Three.js tidak bisa dimuat. Pastikan ada koneksi internet saat pembukaan pertama, atau unduh three.min.js dan arahkan tag script ke file lokal.</p>
+    </div>
+  </div>
+</div>
+
+<script src="https://unpkg.com/three@0.152.2/build/three.min.js"></script>
+<script src="js/util.js"></script>
+<script src="js/audio.js"></script>
+<script src="js/input.js"></script>
+<script src="js/render.js"></script>
+<script src="js/world.js"></script>
+<script src="js/game.js"></script>
+</body>
+</html>
